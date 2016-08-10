@@ -2,7 +2,6 @@
 import requests
 import configparser
 import urllib.parse
-import sys
 from datetime import date, timedelta
 
 
@@ -70,7 +69,7 @@ def crashes_sessions(app):
     devices = config[app]['devices'].split(' ')
     numbers = {}
     space()
-    print("{}___{}___{}".format('\b', app, '\b0'))
+    print("{}___{}___{}".format('\033[1m', app, '\033[0m'))
     for device in devices:
         print("{}---".format(device))
         total_crashes = tot_crashed(app, device)
@@ -92,7 +91,6 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.stdout = open('crash_data', 'w')
     config = configparser.ConfigParser()
     config.read("config.conf")
     main()
