@@ -16,7 +16,6 @@ def last_month():
     days_in_month = (calendar.monthrange(year, month))[1]
     last_day = datetime.date(year, month, days_in_month)
     first_day = datetime.date(year, month, 1)
-
     return first_day, last_day
 
 
@@ -59,10 +58,11 @@ def space():
 
 def crashes_sessions(app):
     devices = config[app]['devices'].split(' ')
-    numbers = {}
     space()
     print("{}___{}___{}".format('\033[1m', app, '\033[0m'))
     all_sessions = []
+    phone_sessions = []
+    tablet_sessions = []
     for device in devices:
         print("{}---".format(device))
         total_crashes = tot_crashed(app, device)
@@ -71,12 +71,17 @@ def crashes_sessions(app):
         print("All sessions: {}".format(total_sessions))
         crash_math(total_sessions, total_crashes)
         all_sessions += [total_crashes, total_sessions]
+        if device == 'iPhone' or device == 'Phone':
+            phone_sessions += [total_crashes, total_sessions]
+        else:
+            tablet_sessions += [total_crashes, total_sessions]
     decimal.getcontext().prec = 2
     try:
         overall = ((D(all_sessions[0]) + D(all_sessions[2])) / D((all_sessions[1]) + D(all_sessions[3]))) * 100
     except IndexError:
         overall = (D(all_sessions[0]) / D(all_sessions[1])) * 100
     print("{}{}{}: {}%".format('\033[1m', 'Overall', '\033[0m', D(overall)))
+    return all_sessions, phone_sessions, tablet_sessions
 
 
 def crash_math(tot_sessions, tot_crashed):
@@ -90,8 +95,18 @@ def main():
     D = decimal.Decimal
     apps = config.sections()
     print("From {} to {}".format(last_month()[0], last_month()[1]))
+    all_stats = []
+    phone_stats = []
+    tablet_stats = []
     for app in apps:
-         crashes_sessions(app)
+        all_sessions, phone_sessions, tablet_sessions = crashes_sessions(app)
+        all_stats += all_sessions
+        phone_stats += phone_sessions
+        tablet_stats += tablet_sessions
+    print("{}All Phone Apps Overall Crash Percentage: {}{}".format('\033[1m', D(sum(phone_stats[::2])) / D(sum(phone_stats[1::2])) * 100, '\033[0m'))
+    print("{}All Tablet Apps Overall Crash Percentage: {}{}".format('\033[1m', D(sum(tablet_stats[::2])) / D(sum(tablet_stats[1::2])) * 100, '\033[0m'))
+    print("{}All Apps Overall Crash Percentage: {}{}".format('\033[1m', D(sum(all_stats[::2])) / D(sum(all_stats[1::2])) * 100, '\033[0m'))
+
 
 if __name__ == "__main__":
     config = configparser.ConfigParser()
