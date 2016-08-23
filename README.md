@@ -1,2 +1,2 @@
 # appsee_stats
-Script to get the previous week's (Mon thru Sun) Appsee crashes and sessions.
+Scripts to get the previous full week's (Mon thru Sun) Appsee crashes and sessions, as well as monthly overall crash percentages. — Edit
